@@ -1,6 +1,7 @@
 from pathlib import Path
 import environ
 import os
+from datetime import timedelta
 
 env = environ.Env(
     # set casting, default value
@@ -131,4 +132,10 @@ STATIC_URL = 'static/'
 
 REST_FRAMEWORK = {
   # TODO: Add your REST framework settings here
+}
+
+# JWT Settings
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
 }
