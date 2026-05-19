@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     # ----- ENVIRON -----
     "environ",
     # ----- APPS -----
+    "users",
 ]
 
 MIDDLEWARE = [
@@ -131,7 +132,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 REST_FRAMEWORK = {
-  # TODO: Add your REST framework settings here
+   'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
 }
 
 # JWT Settings
