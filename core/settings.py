@@ -49,6 +49,9 @@ INSTALLED_APPS = [
     "drf_spectacular",
     # ----- APPS -----
     "users",
+    "folders",
+    "vehicles",
+    "backoffice",
 ]
 
 MIDDLEWARE = [
