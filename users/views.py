@@ -16,10 +16,12 @@ class RegisterView(generics.CreateAPIView):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.save()
+        default_group = Group.objects.get(name='user')
+        user.groups.add(default_group)
         refresh = RefreshToken.for_user(user)
         return Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
-            "message": "User registered successfully.",
+            "message": "Utilisateur enregistré avec succès.",
             "refresh": str(refresh),
             "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
