@@ -6,8 +6,10 @@ from rest_framework.response import Response
 from django.contrib.auth.models import User
 
 
-# Register API view
 class RegisterView(generics.CreateAPIView):
+    """
+    Endpoint for user registration.
+    """
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [AllowAny]
@@ -27,8 +29,10 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-# endpoint to get the current authenticated user's details
 class UserDetailView(APIView):
+    """
+    Endpoint to retrieve the current authenticated user's details.
+    """
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
 
