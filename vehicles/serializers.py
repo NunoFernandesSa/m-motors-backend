@@ -45,7 +45,7 @@ class VehicleCreateUpdateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Le kilométrage ne peut pas être négatif.")
         return value
 
-    def validate(self, attrs):
+    def validate_rent_price_and_sale_price(self, attrs):
         """
         Custom validation to ensure that the sale price is greater than the rent price if both are provided.
         """        
