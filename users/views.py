@@ -33,8 +33,8 @@ class UserDetailView(APIView):
     """
     Endpoint to retrieve the current authenticated user's details.
     """
+    serializer_class = UserSerializer 
     permission_classes = [IsAuthenticated]
-    serializer_class = UserSerializer
 
     def get_object(self):
         return self.request.user
