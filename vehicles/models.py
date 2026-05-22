@@ -26,11 +26,15 @@ class Vehicle(models.Model):
     transmission = models.CharField(max_length=20, choices=Transmission.choices, verbose_name="Boîte de vitesses")
     color = models.CharField(max_length=50, verbose_name="Couleur")
     description = models.TextField(verbose_name="Description")
+    
     # Images (stockage en JSON pour dev, à migrer vers S3 plus tard)
     # TODO : Migrer vers un système de stockage d'images (ex: S3) et utiliser un champ ImageField ou un modèle séparé pour les images
     images = models.JSONField(default=list, verbose_name="Images", help_text="Liste d'URLs d'images")
+    
     vehicle_type = models.CharField(max_length=10, choices=VehicleType.choices, verbose_name="Type de véhicule")
+    
     is_available = models.BooleanField(default=True, verbose_name="Disponible")
+   
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
 
