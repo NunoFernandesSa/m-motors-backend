@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from .models import Vehicle
 
@@ -18,15 +19,15 @@ class VehicleSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['created_at', 'updated_at']
       
-        def get_price(self, obj):
-          """
-          Method to determine the price of the vehicle based on its type. If the vehicle is for sale, it returns the sale price; if it is for rent, it returns the rent price. This method allows the API to provide a single 'price' field that dynamically reflects the appropriate price based on the vehicle's type.
-          """
+    @extend_schema_field(serializers.DecimalField(max_digits=10, decimal_places=2))
+    def get_price(self, obj):
+        """
+        Method to determine the price of the vehicle based on its type. If the vehicle is for sale, it returns the sale price; if it is for rent, it returns the rent price. This method allows the API to provide a single 'price' field that dynamically reflects the appropriate price based on the vehicle's type.
+        """
 
-          if obj.vehicle_type == 'sale':
-              return obj.sale_price
-          
-          return obj.rent_price
+        if obj.vehicle_type == 'sale':
+            return obj.sale_price
+        return obj.rent_price
 
 
 class VehicleCreateUpdateSerializer(serializers.ModelSerializer):
@@ -35,7 +36,11 @@ class VehicleCreateUpdateSerializer(serializers.ModelSerializer):
     """
     class Meta:
         model = Vehicle
-        fields = ['__all__']
+        fields = [
+            'brand', 'model', 'year', 'mileage', 'fuel_type', 'transmission',
+            'color', 'description', 'images', 'vehicle_type', 'sale_price',
+            'rent_price', 'rent_duration_min', 'is_available'
+        ]
 
     def validate(self, data):
         """
