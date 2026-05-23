@@ -52,3 +52,13 @@ class VehicleCreateUpdateSerializer(serializers.ModelSerializer):
         if attrs['sale_price'] and attrs['rent_price'] and attrs['sale_price'] <= attrs['rent_price']:
             raise serializers.ValidationError("Le prix de vente doit être supérieur au prix de location.")
         return attrs
+    
+    def validate_rent_duration_min(self, value):
+        """
+        Validation to ensure that the minimum rental duration is a positive integer. This method checks if the provided rent_duration_min value is less than or equal to zero and raises a validation error if it is, as a rental duration must be a positive integer.
+        """
+
+        if value is not None and value <= 0:
+            raise serializers.ValidationError("La durée minimale de location doit être un entier positif.")
+        
+        return value

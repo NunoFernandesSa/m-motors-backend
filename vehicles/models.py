@@ -26,6 +26,7 @@ class Vehicle(models.Model):
     transmission = models.CharField(max_length=20, choices=Transmission.choices, verbose_name="Boîte de vitesses")
     color = models.CharField(max_length=50, verbose_name="Couleur")
     description = models.TextField(verbose_name="Description")
+    rent_duration_min = models.PositiveIntegerField(null=True, blank=True, help_text="Durée minimale de location en mois")
     
     # Images (stockage en JSON pour dev, à migrer vers S3 plus tard)
     # TODO : Migrer vers un système de stockage d'images (ex: S3) et utiliser un champ ImageField ou un modèle séparé pour les images
