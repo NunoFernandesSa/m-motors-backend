@@ -2,8 +2,10 @@ from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from folders.models import Folder
-from folders.serializers import FolderSerializer, FolderCreateSerializer
+from folders.serializers import DocumentSerializer, FolderSerializer, FolderCreateSerializer
 from folders.permissions import IsOwnerOrCommercial, CanValidateFolder
+from rest_framework.parsers import MultiPartParser, FormParser
+from .admin import Document
 
 
 class FolderListCreateView(generics.ListCreateAPIView):
@@ -85,3 +87,26 @@ class FolderValidateView(generics.UpdateAPIView):
 
         serializer = self.get_serializer(folder)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class DocumentUploadView(generics.CreateAPIView):
+    """
+    API view to upload a document to a folder.
+    """
+
+    permission_classes = [IsAuthenticated, IsOwnerOrCommercial]
+    serializer_class = DocumentSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+    def perform_create(self, serializer):
+        """
+        Set the folder of the document based on the URL parameter and check permissions.
+        """
+
+        folder_id = self.kwargs.get('folder_pk')
+        folder = Folder.objects.get(pk=folder_id)
+
+        if self.request.user != folder.user and not self.request.user.groups.filter(name__in=['commercial', 'admin']).exists():
+            raise self.permission_denied("Vous n'avez pas accès à ce dossier.")
+        
+        serializer.save(folder=folder)
