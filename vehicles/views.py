@@ -5,8 +5,86 @@ from vehicles.permissions import CanManageVehicles, IsCommercialOrAdmin
 from vehicles.serializers import VehicleCreateUpdateSerializer, VehicleSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
+from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter, OpenApiTypes, OpenApiResponse, OpenApiExample
 
 
+@extend_schema_view(
+    list=extend_schema(
+        summary="Liste des véhicules disponibles",
+        description="Retourne la liste des véhicules avec possibilité de filtrage par type (sale/rent), marque, modèle, et fourchette de prix.",
+        tags=["vehicles"],
+        parameters=[
+            OpenApiParameter(name="type", type=str, location=OpenApiParameter.QUERY, enum=["sale", "rent"], description="Type de contrat (vente ou location)"),
+            OpenApiParameter(name="brand", type=str, location=OpenApiParameter.QUERY, description="Marque (recherche insensible à la casse)"),
+            OpenApiParameter(name="model", type=str, location=OpenApiParameter.QUERY, description="Modèle (recherche insensible à la casse)"),
+            OpenApiParameter(name="min_price", type=float, location=OpenApiParameter.QUERY, description="Prix minimum (selon le type)"),
+            OpenApiParameter(name="max_price", type=float, location=OpenApiParameter.QUERY, description="Prix maximum"),
+        ],
+        responses={200: VehicleSerializer(many=True)},
+        examples=[
+            OpenApiExample(
+                "Exemple de filtre",
+                value={ "type": "sale", "brand": "Renault", "min_price": 10000 },
+                request_only=True,
+            )
+        ]
+    ),
+    create=extend_schema(
+        summary="Ajouter un véhicule",
+        description="Crée un nouveau véhicule. Réservé aux commerciaux/admins. Les champs `sale_price` ou `rent_price` sont obligatoires selon `vehicle_type`.",
+        tags=["vehicles"],
+        request=VehicleCreateUpdateSerializer,
+        responses={
+            201: VehicleSerializer,
+            400: OpenApiResponse(description="Erreur de validation (prix manquant, année invalide, etc.)"),
+            403: OpenApiResponse(description="Permission non accordée"),
+        }
+    ),
+    retrieve=extend_schema(
+        summary="Détail d'un véhicule",
+        description="Retourne les informations complètes d'un véhicule spécifique.",
+        tags=["vehicles"],
+        responses={200: VehicleSerializer, 404: OpenApiResponse(description="Véhicule non trouvé")}
+    ),
+    update=extend_schema(
+        summary="Modifier tout un véhicule",
+        description="Remplace l'intégralité des données d'un véhicule. Réservé aux commerciaux/admins.",
+        tags=["vehicles"],
+        request=VehicleCreateUpdateSerializer,
+        responses={200: VehicleSerializer}
+    ),
+    partial_update=extend_schema(
+        summary="Modification partielle",
+        description="Met à jour certains champs d'un véhicule. Réservé aux commerciaux/admins.",
+        tags=["vehicles"],
+        request=VehicleCreateUpdateSerializer,
+        responses={200: VehicleSerializer}
+    ),
+    destroy=extend_schema(
+        summary="Supprimer un véhicule",
+        description="Supprime définitivement un véhicule. Réservé aux commerciaux/admins.",
+        tags=["vehicles"],
+        responses={204: OpenApiResponse(description="Supprimé avec succès"), 403: OpenApiResponse(description="Permission non accordée")}
+    ),
+    change_type=extend_schema(
+        summary="Basculer entre vente et location",
+        description="Change le type de contrat d'un véhicule. Nécessite la permission `can_change_vehicle_type`. Fournir les nouveaux prix selon le type.",
+        tags=["vehicles"],
+        methods=["PATCH"],
+        request={
+            "application/json": {
+                "type": "object",
+                "properties": {
+                    "vehicle_type": {"type": "string", "enum": ["sale", "rent"]},
+                    "sale_price": {"type": "number", "description": "Prix de vente (si passage à 'sale')"},
+                    "rent_price": {"type": "number", "description": "Loyer mensuel (si passage à 'rent')"},
+                    "rent_duration_min": {"type": "integer", "description": "Durée minimale en mois (si passage à 'rent')"}
+                }
+            }
+        },
+        responses={200: VehicleSerializer, 400: OpenApiResponse(description="Données invalides"), 403: OpenApiResponse(description="Permission non accordée")}
+    )
+)
 class VehicleViewSet(viewsets.ModelViewSet):
     """
     ModelViewSet for managing vehicles. Allows listing, creating, updating, and deleting vehicles.

@@ -157,7 +157,7 @@ SPECTACULAR_SETTINGS = {
     'SERVE_INCLUDE_SCHEMA': False,
      'TAGS': [
         {'name': 'users', 'description': 'Gestion des utilisateurs et authentification'},
-        {'name': 'vehicles', 'description': 'Catalogue des véhicules'},
+        {'name': 'vehicles', 'description': 'Gestion du catalogue des véhicules'},
         {'name': 'folders', 'description': 'Dossiers clients'},
     ],
 }
