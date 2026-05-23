@@ -1,6 +1,16 @@
 from django.db import models
 from django.contrib.auth.models import User
 from vehicles.models import Vehicle
+import os
+from django.db import models
+from django.core.validators import FileExtensionValidator
+
+def document_upload_path(instance, filename):
+    """
+    Generates a dynamic file path for uploaded documents based on the user and folder IDs.
+    The path format is: 'documents/user_{user_id}/folder_{folder_id}/{filename}'.
+    """
+    return f'documents/user_{instance.folder.user.id}/folder_{instance.folder.id}/{filename}'
 
 
 class Folder(models.Model):
@@ -39,3 +49,25 @@ class Folder(models.Model):
         """
         
         return f"Dossier {self.id} - {self.user.username} - {self.vehicle}"
+    
+
+class Document(models.Model):
+    """
+    Model representing a document uploaded to a folder. Each document is associated with a specific folder and includes a file field for the uploaded document.
+    """
+    
+    folder = models.ForeignKey('Folder', on_delete=models.CASCADE, related_name='documents')
+    file = models.FileField(
+        upload_to=document_upload_path,
+        validators=[
+            FileExtensionValidator(allowed_extensions=['pdf', 'png', 'jpg', 'jpeg'])
+        ]
+    )
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        """
+        Returns the base name of the uploaded file for display purposes.
+        """
+
+        return os.path.basename(self.file.name)
