@@ -1,11 +1,11 @@
 from rest_framework import generics, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from folders.models import Folder
+from folders.models import Folder, Document
 from folders.serializers import DocumentSerializer, FolderSerializer, FolderCreateSerializer
 from folders.permissions import IsOwnerOrCommercial, CanValidateFolder
 from rest_framework.parsers import MultiPartParser, FormParser
-from .admin import Document
+
 
 
 class FolderListCreateView(generics.ListCreateAPIView):
@@ -50,7 +50,7 @@ class FolderDetailView(generics.RetrieveUpdateDestroyAPIView):
     API view to retrieve, update or delete a folder.
     """
 
-    permission_classes = [IsAuthenticated, IsOwnerOrCommercial | CanValidateFolder]
+    permission_classes = [IsAuthenticated, IsOwnerOrCommercial]
     serializer_class = FolderSerializer
     queryset = Folder.objects.all()
     http_method_names = ['get', 'patch']

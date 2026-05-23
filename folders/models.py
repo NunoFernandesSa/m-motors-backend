@@ -25,8 +25,6 @@ class Folder(models.Model):
     ]
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    # TODO: upload documents to S3 and store the URLs in the database
-    documents = models.JSONField(default=list, help_text="Liste d'URLs des documents téléchargés")
     comment = models.TextField(blank=True, help_text="Motif de refus ou commentaire commercial")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -56,7 +54,7 @@ class Document(models.Model):
     Model representing a document uploaded to a folder. Each document is associated with a specific folder and includes a file field for the uploaded document.
     """
     
-    folder = models.ForeignKey('Folder', on_delete=models.CASCADE, related_name='documents')
+    folder = models.ForeignKey('Folder', on_delete=models.CASCADE, related_name='document_files')
     file = models.FileField(
         upload_to=document_upload_path,
         validators=[

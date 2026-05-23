@@ -21,12 +21,12 @@ class FolderSerializer(serializers.ModelSerializer):
     
     user_details = UserSerializer(source='user', read_only=True)
     vehicle_details = VehicleSerializer(source='vehicle', read_only=True)
-    documents = DocumentSerializer(many=True, read_only=True)
+    document_files = DocumentSerializer(many=True, read_only=True)
 
     class Meta:
         model = Folder
-        fields = ['id', 'user', 'user_details', 'vehicle', 'vehicle_details', 'status', 'documents', 'comment', 'created_at', 'updated_at']
-        read_only_fields = ['id', 'created_at', 'updated_at', 'status', 'comment']
+        fields = ['id', 'user', 'user_details', 'vehicle', 'vehicle_details', 'status', 'document_files', 'comment', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
         extra_kwargs = {
             'user': {'write_only': True},
             'vehicle': {'write_only': True},
