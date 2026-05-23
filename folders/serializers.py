@@ -40,7 +40,7 @@ class FolderCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folder
-        fields = ['vehicle', 'documents']
+        fields = ['vehicle', 'document_files']
 
     def validate_vehicle(self, value):
         """
