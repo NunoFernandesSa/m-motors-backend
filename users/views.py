@@ -3,11 +3,54 @@ from .serializers import RegisterSerializer, UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
-from drf_spectacular.utils import extend_schema_view, extend_schema
+from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema_view, extend_schema
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 @extend_schema_view(
-    post=extend_schema(description="Enregistrer un nouvel utilisateur")
+    create=extend_schema(
+        summary="Inscription d'un nouvel utilisateur",
+        description="Crée un compte utilisateur avec le rôle 'user' par défaut. Retourne les tokens JWT (access + refresh).",
+        tags=["users"],
+        request=RegisterSerializer,
+        responses={
+            201: OpenApiResponse(
+                description="Utilisateur créé avec succès",
+                response={
+                    "type": "object",
+                    "properties": {
+                        "user": UserSerializer,
+                        "message": {"type": "string"},
+                        "refresh": {"type": "string"},
+                        "access": {"type": "string"},
+                    }
+                }
+            ),
+            400: OpenApiResponse(description="Erreur de validation (ex: mots de passe non identiques, email déjà utilisé)"),
+        },
+        examples=[
+            OpenApiExample(
+                "Requête valide",
+                value={
+                    "username": "john_doe",
+                    "email": "john@example.com",
+                    "password": "Azerty123!",
+                    "password2": "Azerty123!"
+                },
+                request_only=True,
+            ),
+            OpenApiExample(
+                "Réponse réussie",
+                value={
+                    "user": {"id": 1, "username": "john_doe", "email": "john@example.com"},
+                    "message": "Utilisateur enregistré avec succès.",
+                    "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+                    "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+                },
+                response_only=True,
+            )
+        ]
+    )
 )
 class RegisterView(generics.CreateAPIView):
     """
@@ -33,9 +76,26 @@ class RegisterView(generics.CreateAPIView):
 
 
 @extend_schema_view(
-    get=extend_schema(description="Récupérer le profil de l'utilisateur connecté"),
-    put=extend_schema(description="Mettre à jour le profil complet"),
-    patch=extend_schema(description="Mise à jour partielle du profil"),
+    get=extend_schema(
+        summary="Obtenir le profil",
+        description="Retourne les informations de l'utilisateur authentifié.",
+        tags=["users"],
+        responses={200: UserSerializer, 401: OpenApiResponse(description="Non authentifié")}
+    ),
+    put=extend_schema(
+        summary="Mettre à jour tout le profil",
+        description="Remplace l'intégralité du profil de l'utilisateur connecté.",
+        tags=["users"],
+        request=UserSerializer,
+        responses={200: UserSerializer, 400: OpenApiResponse(description="Erreur de validation")}
+    ),
+    patch=extend_schema(
+        summary="Mise à jour partielle",
+        description="Modifie uniquement les champs fournis dans la requête.",
+        tags=["users"],
+        request=UserSerializer,
+        responses={200: UserSerializer, 400: OpenApiResponse(description="Erreur de validation")}
+    )
 )
 class UserDetailView(generics.RetrieveUpdateAPIView):
     """

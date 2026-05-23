@@ -155,5 +155,9 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': "Cette API REST permet de gérer l'intégralité du nouveau service de location longue durée avec option d'achat (LLD+OA) proposé par l'entreprise. Elle alimente l'application web refondue (frontend Next.js) et le back-office.",
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
-    # OTHER SETTINGS
+     'TAGS': [
+        {'name': 'users', 'description': 'Gestion des utilisateurs et authentification'},
+        {'name': 'vehicles', 'description': 'Catalogue des véhicules'},
+        {'name': 'folders', 'description': 'Dossiers clients'},
+    ],
 }
