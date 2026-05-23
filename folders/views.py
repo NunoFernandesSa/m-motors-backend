@@ -177,11 +177,6 @@ class FolderValidateView(generics.UpdateAPIView):
         parameters=[
             OpenApiParameter(name="folder_pk", type=int, location=OpenApiParameter.PATH, description="ID du dossier"),
         ],
-        request={
-            "multipart/form-data": {
-                "file": OpenApiTypes.BINARY,
-            }
-        },
         responses={201: DocumentSerializer, 400: OpenApiResponse(description="Type de fichier non autorisé"), 403: OpenApiResponse(description="Accès interdit")},
         examples=[
             OpenApiExample(
