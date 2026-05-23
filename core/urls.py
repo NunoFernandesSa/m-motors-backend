@@ -11,7 +11,7 @@ urlpatterns = [
     
     path('api/auth/', include('users.urls')),
    
-    path('api/', include('vehicles.urls')),
+    path('api/vehicles/', include('vehicles.urls')),
 
     path('api/folders/', include('folders.urls')),
 ]
