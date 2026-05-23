@@ -1,7 +1,8 @@
 from rest_framework import viewsets
+from users import models
 from vehicles.models import Vehicle
 from vehicles.permissions import CanManageVehicles, IsCommercialOrAdmin
-from vehicles.serializers import VehicleSerializer
+from vehicles.serializers import VehicleCreateUpdateSerializer, VehicleSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 
@@ -27,6 +28,14 @@ class VehicleViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAuthenticatedOrReadOnly]
         return [permission() for permission in permission_classes]
+    
+    def get_serializer_class(self):
+        """
+        Override the default serializer to use different serializers for different actions. For create and update actions, use VehicleCreateUpdateSerializer which includes validation for price fields. For other actions, use VehicleSerializer which includes a method field for price.
+        """
+        if self.action in ['create', 'update', 'partial_update']:
+            return VehicleCreateUpdateSerializer
+        return VehicleSerializer
     
     def get_queryset(self):
         """
@@ -55,11 +64,27 @@ class VehicleViewSet(viewsets.ModelViewSet):
 
         min_price = self.request.query_params.get('min_price')
         if min_price:
-            queryset = queryset.filter(price__gte=min_price)
+            if vehicle_type == 'sale':
+                queryset = queryset.filter(sale_price__gte=min_price)
+            elif vehicle_type == 'rent':
+                queryset = queryset.filter(rent_price__gte=min_price)
+            else:
+                queryset = queryset.filter(
+                    models.Q(vehicle_type='sale', sale_price__gte=min_price) |
+                    models.Q(vehicle_type='rent', rent_price__gte=min_price)
+                )
 
         max_price = self.request.query_params.get('max_price')
         if max_price:
-            queryset = queryset.filter(price__lte=max_price)
+            if vehicle_type == 'sale':
+                queryset = queryset.filter(sale_price__lte=max_price)
+            elif vehicle_type == 'rent':
+                queryset = queryset.filter(rent_price__lte=max_price)
+            else:
+                queryset = queryset.filter(
+                    models.Q(vehicle_type='sale', sale_price__lte=max_price) |
+                    models.Q(vehicle_type='rent', rent_price__lte=max_price)
+                )
 
         return queryset
 
@@ -80,9 +105,21 @@ class VehicleViewSet(viewsets.ModelViewSet):
             )
         
         new_type = request.data.get('vehicle_type')
-
         if new_type not in ['sale', 'rent']:
             return Response({'error': 'Type de véhicule invalide. Doit être "vente" ou "location".'}, status=status.HTTP_400_BAD_REQUEST)
+        
+        if new_type == 'sale' and vehicle.vehicle_type == 'rent':
+            vehicle.sale_price = request.data.get('sale_price', None)
+            if not vehicle.sale_price:
+                return Response({"detail": "Le prix de vente est requis."}, status=status.HTTP_400_BAD_REQUEST)
+            vehicle.rent_price = None
+            vehicle.rent_duration_min = None
+        elif new_type == 'rent' and vehicle.vehicle_type == 'sale':
+            vehicle.rent_price = request.data.get('rent_price', None)
+            if not vehicle.rent_price:
+                return Response({"detail": "Le loyer mensuel est requis."}, status=status.HTTP_400_BAD_REQUEST)
+            vehicle.sale_price = None
+            vehicle.rent_duration_min = request.data.get('rent_duration_min', 12)
 
         vehicle.vehicle_type = new_type
         vehicle.save()
