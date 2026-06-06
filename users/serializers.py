@@ -1,5 +1,16 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        # find the user's group and add it to the token
+        group = user.groups.first()
+        token['role'] = group.name if group else 'user'
+        return token
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -31,7 +42,13 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-  class Meta:
-    model = User
-    fields = ['id', 'username', 'email']
-    read_only_fields = ['id', 'date_joined']
+    role = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'role']
+        read_only_fields = ['id', 'date_joined']
+
+    def get_role(self, user):
+        group = user.groups.first()
+        return group.name if group else 'user'
