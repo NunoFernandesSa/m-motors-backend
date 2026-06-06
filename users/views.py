@@ -1,10 +1,12 @@
 from rest_framework import generics, status
-from .serializers import RegisterSerializer, UserSerializer
+from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer, UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
 from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema_view, extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework.views import APIView
 
 
 @extend_schema_view(
@@ -106,3 +108,53 @@ class UserDetailView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    serializer_class = CustomTokenObtainPairSerializer
+
+    def post(self, request, *args, **kwargs):
+        response = super().post(request, *args, **kwargs)
+        if response.status_code == 200:
+            access_token = response.data.get('access')
+            refresh_token = response.data.get('refresh')
+            # Access token (5 minutes)
+            response.set_cookie(
+                'access_token',
+                access_token,
+                httponly=True,
+                secure=False,  # True on production (HTTPS)
+                samesite='Lax',
+                max_age=300,   # 5 minutes
+                path='/',
+            )
+            # Refresh token (1 day)
+            response.set_cookie(
+                'refresh_token',
+                refresh_token,
+                httponly=True,
+                secure=False,  # True on production (HTTPS)
+                samesite='Lax',
+                max_age=86400,
+                path='/',
+            )
+            # Remove the tokens from the JSON body for added security.
+            response.data = {'message': 'Connexion réussie'}
+        return response
+
+@extend_schema_view(
+    post=extend_schema(
+        summary="Déconnexion",
+        description="Supprime les cookies d'authentification pour déconnecter l'utilisateur.",
+        tags=["users"],
+        responses={200: OpenApiResponse(description="Déconnexion réussie")}
+    )
+)
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        response = Response({"message": "Déconnexion réussie"})
+        response.delete_cookie('access_token')
+        response.delete_cookie('refresh_token')
+        return response
