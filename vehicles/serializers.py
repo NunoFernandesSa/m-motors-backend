@@ -12,7 +12,7 @@ class VehicleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
         fields = [
-            'id', 'brand', 'model', 'year', 'mileage', 'fuel_type',
+            'id', 'ref', 'brand', 'model', 'year', 'mileage', 'fuel_type',
             'transmission', 'color', 'description', 'images', 'vehicle_type',
             'sale_price', 'rent_price', 'rent_duration_min', 'is_available',
             'created_at', 'updated_at', 'price'
@@ -37,7 +37,7 @@ class VehicleCreateUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Vehicle
         fields = [
-            'brand', 'model', 'year', 'mileage', 'fuel_type', 'transmission',
+            'ref', 'brand', 'model', 'year', 'mileage', 'fuel_type', 'transmission',
             'color', 'description', 'images', 'vehicle_type', 'sale_price',
             'rent_price', 'rent_duration_min', 'is_available'
         ]

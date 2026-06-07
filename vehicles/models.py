@@ -16,6 +16,7 @@ class Vehicle(models.Model):
         MANUAL = 'manuel', 'Manuelle'
         AUTOMATIC = 'automatique', 'Automatique'
 
+    ref = models.CharField(max_length=50, unique=True, blank=True, verbose_name="Référence")
     brand = models.CharField(max_length=100, verbose_name="Marque")
     model = models.CharField(max_length=100, verbose_name="Modèle")
     year = models.IntegerField(verbose_name="Année")
@@ -47,6 +48,21 @@ class Vehicle(models.Model):
             ("can_manage_vehicles", "Peut gérer tous les véhicules (CRUD)"),
             ("can_change_vehicle_type", "Peut basculer un véhicule de vente à location et inversement"),
         ]
+
+    def save(self, *args, **kwargs):
+        if not self.ref:
+            prefix = f"{self.year}-{self.brand.upper()}"
+            last = Vehicle.objects.filter(ref__startswith=prefix).order_by('id').last()
+            if last:
+                try:
+                    last_num = int(last.ref.split('-')[-1])
+                    new_num = last_num + 1
+                except:
+                    new_num = 1
+            else:
+                new_num = 1
+            self.ref = f"{prefix}-{new_num:03d}"
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year}) - {self.get_vehicle_type_display()}"
