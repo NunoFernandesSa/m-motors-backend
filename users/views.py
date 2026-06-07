@@ -144,17 +144,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             response.data = {'message': 'Connexion réussie'}
         return response
 
-@extend_schema_view(
-    post=extend_schema(
-        summary="Déconnexion",
-        description="Supprime les cookies d'authentification pour déconnecter l'utilisateur.",
-        tags=["auth"],
-        responses={
-            200: OpenApiResponse(description="Déconnexion réussie"),
-            401: OpenApiResponse(description="Non authentifié"),
-        }
-    )
-)
+@extend_schema(operation_id="logout", summary="Déconnexion", tags=["auth"])
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 

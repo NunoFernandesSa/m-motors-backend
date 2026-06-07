@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
@@ -48,7 +49,8 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ['id', 'username', 'email', 'role']
         read_only_fields = ['id', 'date_joined']
-
+        
+    @extend_schema_field(serializers.CharField())
     def get_role(self, user):
         group = user.groups.first()
         return group.name if group else 'user'

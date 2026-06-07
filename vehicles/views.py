@@ -39,7 +39,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
         },
         responses={201: VehicleSerializer, 400: OpenApiResponse(description="Erreur de validation")}
     ),
-    retrieve=extend_schema(...),
+    retrieve=extend_schema(operation_id="vehicle_retrieve"),
     update=extend_schema(
         summary="Modifier un véhicule",
         description="Remplace toutes les données d'un véhicule. Les images sont remplacées par celles envoyées.",
@@ -54,7 +54,7 @@ from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiPara
         request={'multipart/form-data': {}},
         responses={200: VehicleSerializer}
     ),
-    destroy=extend_schema(...),
+    destroy=extend_schema(operation_id="vehicle_destroy"),
     change_type=extend_schema(
         summary="Basculer entre vente et location",
         description="Change le type de contrat d'un véhicule. Nécessite la permission `can_change_vehicle_type`.",
