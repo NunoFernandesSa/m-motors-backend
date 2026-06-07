@@ -29,14 +29,10 @@ class Vehicle(models.Model):
     description = models.TextField(verbose_name="Description")
     rent_duration_min = models.PositiveIntegerField(null=True, blank=True, help_text="Durée minimale de location en mois")
     
-    # Images (stockage en JSON pour dev, à migrer vers S3 plus tard)
-    # TODO : Migrer vers un système de stockage d'images (ex: S3) et utiliser un champ ImageField ou un modèle séparé pour les images
-    images = models.JSONField(default=list, verbose_name="Images", help_text="Liste d'URLs d'images")
+    # images = models.JSONField(default=list, verbose_name="Images", help_text="Liste d'URLs d'images")
     
     vehicle_type = models.CharField(max_length=10, choices=VehicleType.choices, verbose_name="Type de véhicule")
-    
     is_available = models.BooleanField(default=True, verbose_name="Disponible")
-   
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Date de création")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="Date de mise à jour")
 
@@ -66,3 +62,18 @@ class Vehicle(models.Model):
 
     def __str__(self):
         return f"{self.brand} {self.model} ({self.year}) - {self.get_vehicle_type_display()}"
+
+
+class VehicleImage(models.Model):
+    vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='vehicles/%Y/%m/')
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'created_at']
+        verbose_name = "Image"
+        verbose_name_plural = "Images"
+
+    def __str__(self):
+        return f"Image {self.id} - {self.vehicle}"

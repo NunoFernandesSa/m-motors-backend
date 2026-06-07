@@ -1,6 +1,16 @@
 from drf_spectacular.utils import extend_schema_field
 from rest_framework import serializers
-from .models import Vehicle
+from .models import Vehicle, VehicleImage
+
+
+class VehicleImageSerializer(serializers.ModelSerializer):
+    """Serializer for the VehicleImage model. It converts VehicleImage instances to and from JSON format for API interactions. The serializer includes the 'id', 'image', 'order', and 'created_at' fields, with 'id' and 'created_at' marked as read-only to prevent them from being modified through API requests.
+    """
+    class Meta:
+        model = VehicleImage
+        fields = ['id', 'image', 'order', 'created_at']
+        read_only_fields = ['id', 'created_at']
+
 
 class VehicleSerializer(serializers.ModelSerializer):
     """
@@ -8,6 +18,10 @@ class VehicleSerializer(serializers.ModelSerializer):
     """
 
     price = serializers.SerializerMethodField()
+    images = VehicleImageSerializer(many=True, read_only=True)
+    uploaded_images = serializers.ListField(
+        child=serializers.ImageField(), write_only=True, required=False
+    )
 
     class Meta:
         model = Vehicle
@@ -18,6 +32,28 @@ class VehicleSerializer(serializers.ModelSerializer):
             'created_at', 'updated_at', 'price'
         ]
         read_only_fields = ['created_at', 'updated_at']
+
+    def create(self, validated_data):
+        """Custom create method to handle the creation of a Vehicle instance along with its associated images. It first extracts the uploaded images from the validated data, creates the Vehicle instance, and then iterates over the uploaded images to create corresponding VehicleImage instances linked to the created Vehicle. This allows for a seamless creation process where both the vehicle and its images can be created in a single API request.
+        """
+        uploaded_images = validated_data.pop('uploaded_images', [])
+        vehicle = Vehicle.objects.create(**validated_data)
+        for idx, img in enumerate(uploaded_images):
+            VehicleImage.objects.create(vehicle=vehicle, image=img, order=idx)
+        return vehicle
+    
+    def update(self, instance, validated_data):
+        """Custom update method to handle the updating of a Vehicle instance along with its associated images. It first extracts the uploaded images from the validated data, updates the Vehicle instance with the new data, and then checks if there are any uploaded images. If there are, it deletes all existing images associated with the vehicle and creates new VehicleImage instances for each of the uploaded images. This allows for a seamless update process where both the vehicle and its images can be updated in a single API request.
+        """
+        uploaded_images = validated_data.pop('uploaded_images', None)
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        if uploaded_images is not None:
+            instance.images.all().delete()
+            for idx, img in enumerate(uploaded_images):
+                VehicleImage.objects.create(vehicle=instance, image=img, order=idx)
+        return instance
       
     @extend_schema_field(serializers.DecimalField(max_digits=10, decimal_places=2))
     def get_price(self, obj):
@@ -28,62 +64,3 @@ class VehicleSerializer(serializers.ModelSerializer):
         if obj.vehicle_type == 'sale':
             return obj.sale_price
         return obj.rent_price
-
-
-class VehicleCreateUpdateSerializer(serializers.ModelSerializer):
-    """
-    Serializer for creating new Vehicle instances. This serializer is used when a new vehicle is being added to the system. It includes all fields of the Vehicle model except for 'created_at' and 'updated_at', which are automatically set by the system and should not be provided by the user.
-    """
-    class Meta:
-        model = Vehicle
-        fields = [
-            'ref', 'brand', 'model', 'year', 'mileage', 'fuel_type', 'transmission',
-            'color', 'description', 'images', 'vehicle_type', 'sale_price',
-            'rent_price', 'rent_duration_min', 'is_available'
-        ]
-
-    def validate(self, data):
-        """
-        Validation to ensure that the appropriate price field is provided based on the vehicle type. This method checks the 'vehicle_type' field and ensures that if the vehicle is for sale, a 'sale_price' is provided, and if the vehicle is for rent, a 'rent_price' is provided. It also sets the non-applicable price fields to None to maintain data integrity.
-        """
-        
-        vehicle_type = data.get('vehicle_type')
-        sale_price = data.get('sale_price')
-        rent_price = data.get('rent_price')
-
-        if vehicle_type == 'sale':
-            if not sale_price:
-                raise serializers.ValidationError(
-                    {"sale_price": "Le prix de vente est requis pour un véhicule à vendre."}
-                )
-            data['rent_price'] = None
-            data['rent_duration_min'] = None
-        elif vehicle_type == 'rent':
-            if not rent_price:
-                raise serializers.ValidationError(
-                    {"rent_price": "Le loyer mensuel est requis pour un véhicule en location."}
-                )
-            data['sale_price'] = None
-        else:
-            raise serializers.ValidationError({"vehicle_type": "Type invalide."})
-
-        return data
-
-    def validate_year(self, value):
-        """
-        Validation to ensure that the year of the vehicle is between 1990 and the current year plus one. This method checks if the provided year value is less than 1990 or greater than the current year plus one, and raises a validation error if it is, as vehicles outside this range are not considered valid for this application.
-        """
-
-        import datetime
-        current_year = datetime.date.today().year
-        if value < 1990 or value > current_year + 1:
-            raise serializers.ValidationError(f"L'année doit être comprise entre 1990 et {current_year + 1}.")
-        return value
-
-    def validate_mileage(self, value):
-        """
-        Validation to ensure that the mileage is not negative. This method checks if the provided mileage value is less than zero and raises a validation error if it is, as mileage cannot be negative.
-        """
-        if value < 0:
-            raise serializers.ValidationError("Le kilométrage ne peut pas être négatif.")
-        return value
