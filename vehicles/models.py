@@ -66,7 +66,7 @@ class Vehicle(models.Model):
 
 class VehicleImage(models.Model):
     vehicle = models.ForeignKey(Vehicle, on_delete=models.CASCADE, related_name='images')
-    image = models.ImageField(upload_to='vehicles/%Y/%m/')
+    image = models.ImageField(upload_to='vehicles/%Y/%m/',blank=True, null=True, verbose_name="Images")
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
 
