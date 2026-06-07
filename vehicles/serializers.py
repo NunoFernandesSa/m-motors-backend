@@ -29,7 +29,7 @@ class VehicleSerializer(serializers.ModelSerializer):
             'id', 'ref', 'brand', 'model', 'year', 'mileage', 'fuel_type',
             'transmission', 'color', 'description', 'images', 'vehicle_type',
             'sale_price', 'rent_price', 'rent_duration_min', 'is_available',
-            'created_at', 'updated_at', 'price'
+            'created_at', 'updated_at', 'price', 'uploaded_images'
         ]
         read_only_fields = ['created_at', 'updated_at']
 
