@@ -127,6 +127,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 samesite='Lax',
                 max_age=300,   # 5 minutes
                 path='/',
+                domain='localhost'
             )
             # Refresh token (1 day)
             response.set_cookie(
@@ -137,6 +138,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 samesite='Lax',
                 max_age=86400,
                 path='/',
+                domain='localhost'
             )
             # Remove the tokens from the JSON body for added security.
             response.data = {'message': 'Connexion réussie'}
