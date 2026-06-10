@@ -6,6 +6,8 @@ from vehicles.serializers import  VehicleSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly
 from rest_framework.decorators import action
 from drf_spectacular.utils import extend_schema_view, extend_schema, OpenApiParameter,  OpenApiResponse
+import decimal
+from django.db.models import Q
 
 
 @extend_schema_view(
@@ -97,16 +99,6 @@ class VehicleViewSet(viewsets.ModelViewSet):
         return [permission() for permission in permission_classes]
     
     def get_queryset(self):
-        """
-        Override the default queryset to allow filtering based on query parameters.
-        Supported filters:
-        - type: 'sale' or 'rent'
-        - brand: filter by brand name (case-insensitive)
-        - model: filter by model name (case-insensitive)
-        - min_price: filter by minimum price
-        - max_price: filter by maximum price
-        """
-
         queryset = Vehicle.objects.filter(is_available=True)
 
         vehicle_type = self.request.query_params.get('vehicle_type') or self.request.query_params.get('type')
@@ -122,27 +114,39 @@ class VehicleViewSet(viewsets.ModelViewSet):
             queryset = queryset.filter(model__icontains=model)
 
         min_price = self.request.query_params.get('min_price')
-        if min_price:
+        max_price = self.request.query_params.get('max_price')
+
+        # convert on decimal and handle invalid input gracefully
+        try:
+            min_price_dec = decimal.Decimal(min_price) if min_price else None
+        except (decimal.InvalidOperation, TypeError):
+            min_price_dec = None
+
+        try:
+            max_price_dec = decimal.Decimal(max_price) if max_price else None
+        except (decimal.InvalidOperation, TypeError):
+            max_price_dec = None
+
+        if min_price_dec is not None:
             if vehicle_type == 'sale':
-                queryset = queryset.filter(sale_price__gte=min_price)
+                queryset = queryset.filter(sale_price__gte=min_price_dec)
             elif vehicle_type == 'rent':
-                queryset = queryset.filter(rent_price__gte=min_price)
-            else:
+                queryset = queryset.filter(rent_price__gte=min_price_dec)
+            else:  # tous types
                 queryset = queryset.filter(
-                    models.Q(vehicle_type='sale', sale_price__gte=min_price) |
-                    models.Q(vehicle_type='rent', rent_price__gte=min_price)
+                    Q(vehicle_type='sale', sale_price__gte=min_price_dec) |
+                    Q(vehicle_type='rent', rent_price__gte=min_price_dec)
                 )
 
-        max_price = self.request.query_params.get('max_price')
-        if max_price:
+        if max_price_dec is not None:
             if vehicle_type == 'sale':
-                queryset = queryset.filter(sale_price__lte=max_price)
+                queryset = queryset.filter(sale_price__lte=max_price_dec)
             elif vehicle_type == 'rent':
-                queryset = queryset.filter(rent_price__lte=max_price)
+                queryset = queryset.filter(rent_price__lte=max_price_dec)
             else:
                 queryset = queryset.filter(
-                    models.Q(vehicle_type='sale', sale_price__lte=max_price) |
-                    models.Q(vehicle_type='rent', rent_price__lte=max_price)
+                    Q(vehicle_type='sale', sale_price__lte=max_price_dec) |
+                    Q(vehicle_type='rent', rent_price__lte=max_price_dec)
                 )
 
         return queryset
