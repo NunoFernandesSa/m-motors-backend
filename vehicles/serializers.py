@@ -6,10 +6,19 @@ from .models import Vehicle, VehicleImage
 class VehicleImageSerializer(serializers.ModelSerializer):
     """Serializer for the VehicleImage model. It converts VehicleImage instances to and from JSON format for API interactions. The serializer includes the 'id', 'image', 'order', and 'created_at' fields, with 'id' and 'created_at' marked as read-only to prevent them from being modified through API requests.
     """
+
+    image = serializers.SerializerMethodField()
+    
     class Meta:
         model = VehicleImage
         fields = ['id', 'image', 'order', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def get_image(self, obj):
+        request = self.context.get('request')
+        if obj.image and request:
+            return request.build_absolute_uri(obj.image.url)
+        return obj.image.url if obj.image else None
 
 
 class VehicleSerializer(serializers.ModelSerializer):
