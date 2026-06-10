@@ -1,5 +1,5 @@
 from rest_framework import generics, status
-from .serializers import CustomTokenObtainPairSerializer, RegisterSerializer, UserSerializer
+from .serializers import CustomTokenObtainPairSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, RegisterSerializer, UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth.models import User, Group
@@ -153,3 +153,29 @@ class LogoutView(APIView):
         response.delete_cookie('access_token')
         response.delete_cookie('refresh_token')
         return response
+
+
+class PasswordResetView(generics.GenericAPIView):
+    """
+    Endpoint to initiate password reset by sending an email with a reset link.
+    """
+    serializer_class = PasswordResetSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Un email de réinitialisation a été envoyé."}, status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(generics.GenericAPIView):
+    """
+    Endpoint to confirm password reset with uid and token.
+    """
+    serializer_class = PasswordResetConfirmSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Mot de passe modifié avec succès."}, status=status.HTTP_200_OK)
