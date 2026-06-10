@@ -57,7 +57,9 @@ INSTALLED_APPS = [
     "vehicles",
     "backoffice",
     # ----- STORAGE -----
-    'storages'
+    'storages',
+    # ----- FILTERS -----
+    'django_filters',
 ]
 
 MIDDLEWARE = [

@@ -109,7 +109,7 @@ class VehicleViewSet(viewsets.ModelViewSet):
 
         queryset = Vehicle.objects.filter(is_available=True)
 
-        vehicle_type = self.request.query_params.get('type')
+        vehicle_type = self.request.query_params.get('vehicle_type') or self.request.query_params.get('type')
         if vehicle_type in ['sale', 'rent']:
             queryset = queryset.filter(vehicle_type=vehicle_type)
 
