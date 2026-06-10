@@ -107,7 +107,7 @@ class FolderDetailView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated, IsOwnerOrCommercial]
     serializer_class = FolderSerializer
     queryset = Folder.objects.all()
-    http_method_names = ['get', 'patch']
+    http_method_names = ['get', 'patch', 'delete']
 
 
 @extend_schema_view(
