@@ -10,19 +10,12 @@ class IsOwnerOrCommercial(permissions.BasePermission):
         """
         Allow access if the user is the owner of the folder or a commercial user.
         """
-
         # Allow access if the user is the owner of the folder
         if obj.user == request.user:
             return True
-        
-        # Allow access if the user is a commercial
-        if request.user.is_commercial:
-            return True
-        
-        # Deny access otherwise
-        return False
+        return request.user.groups.filter(name__in=['commercial', 'admin']).exists()
 
-
+  
 class CanValidateFolder(permissions.BasePermission):
     """
     Custom permission to only allow commercial users to validate or reject a folder.

@@ -161,8 +161,8 @@ class FolderValidateView(generics.UpdateAPIView):
         folder.status = new_status
 
         if comment:
-            folder.validation_comment = comment
-
+            folder.validation_comment = comment 
+            
         folder.save()
 
         serializer = self.get_serializer(folder)
