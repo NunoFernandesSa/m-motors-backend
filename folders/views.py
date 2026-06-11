@@ -108,6 +108,7 @@ class FolderDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = FolderSerializer
     queryset = Folder.objects.all()
     http_method_names = ['get', 'patch', 'delete']
+    read_only_fields = ['validation_comment']
 
 
 @extend_schema_view(

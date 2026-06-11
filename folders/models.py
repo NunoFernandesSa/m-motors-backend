@@ -25,7 +25,8 @@ class Folder(models.Model):
     ]
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
-    comment = models.TextField(blank=True, help_text="Motif de refus ou commentaire commercial")
+    comment = models.TextField(blank=True, default='', verbose_name="Commentaire du client")
+    validation_comment = models.TextField(blank=True, default='', verbose_name="Commentaire de validation (admin)")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     # ----- Relations -----
