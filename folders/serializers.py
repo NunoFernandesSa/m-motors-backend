@@ -26,7 +26,7 @@ class FolderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Folder
-        fields = ['id', 'user', 'user_details', 'vehicle', 'vehicle_details', 'status', 'document_files', 'comment','validation_comment', 'created_at', 'updated_at']
+        fields = ['id', 'user', 'user_details', 'vehicle', 'vehicle_details', 'status', 'document_files', 'comment','validation_comment','full_name', 'phone', 'address', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
         extra_kwargs = {
             'user': {'write_only': True},

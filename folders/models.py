@@ -25,6 +25,9 @@ class Folder(models.Model):
     ]
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
+    full_name = models.CharField(max_length=255, blank=True, default='', verbose_name="Nom complet")
+    phone = models.CharField(max_length=20, blank=True, default='', verbose_name="Téléphone")
+    address = models.TextField(blank=True, default='', verbose_name="Adresse")
     comment = models.TextField(blank=True, default='', verbose_name="Commentaire du client")
     validation_comment = models.TextField(blank=True, default='', verbose_name="Commentaire de validation (admin)")
     created_at = models.DateTimeField(auto_now_add=True)
