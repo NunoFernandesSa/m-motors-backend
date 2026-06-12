@@ -55,7 +55,6 @@ INSTALLED_APPS = [
     "users",
     "folders",
     "vehicles",
-    "backoffice",
     # ----- STORAGE -----
     'storages',
     # ----- FILTERS -----

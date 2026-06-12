@@ -6,6 +6,7 @@ from folders.serializers import DocumentSerializer, FolderSerializer, FolderCrea
 from folders.permissions import IsOwnerOrCommercial, CanValidateFolder
 from rest_framework.parsers import MultiPartParser, FormParser
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiTypes, OpenApiResponse, OpenApiExample
+from rest_framework.exceptions import PermissionDenied 
 
 
 @extend_schema_view(
@@ -206,6 +207,6 @@ class DocumentUploadView(generics.CreateAPIView):
         folder = Folder.objects.get(pk=folder_id)
 
         if self.request.user != folder.user and not self.request.user.groups.filter(name__in=['commercial', 'admin']).exists():
-            raise self.permission_denied("Vous n'avez pas accès à ce dossier.")
+            raise PermissionDenied("Vous n'avez pas accès à ce dossier.")
         
         serializer.save(folder=folder)
