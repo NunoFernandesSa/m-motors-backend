@@ -1,0 +1,15 @@
+[run]
+omit = 
+    */backoffice/*
+    */migrations/*
+    */tests.py
+    */__init__.py
+    */admin.py
+    */apps.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if __name__ == .__main__.:

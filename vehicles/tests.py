@@ -1,4 +1,3 @@
-# vehicles/tests.py
 from django.test import TestCase
 from django.contrib.auth.models import User, Group, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -10,6 +9,13 @@ from vehicles.serializers import VehicleSerializer
 
 
 class VehicleModelTest(TestCase):
+    """
+    Unit tests for the Vehicle model and serializer.
+      - Verify creation of a vehicle for sale
+      - Verify creation of a vehicle for rent
+      - Verify the model __str__ method
+      - Verify serializer validation
+    """
     @classmethod
     def setUpTestData(cls):
         Group.objects.get_or_create(name='admin')
@@ -49,6 +55,10 @@ class VehicleModelTest(TestCase):
 
 
 class VehicleSerializerTest(TestCase):
+    """
+    Unit tests for the VehicleSerializer to ensure correct validation and object creation.
+    """
+
     def setUp(self):
         self.vehicle_data = {
             "brand": "Ford", "model": "Focus", "year": 2021, "mileage": 40000,
@@ -71,6 +81,9 @@ class VehicleSerializerTest(TestCase):
 
 
 class VehicleAPITest(APITestCase):
+    """
+    Integration tests for the Vehicle API.
+    """
     @classmethod
     def setUpTestData(cls):
         cls.admin_group, _ = Group.objects.get_or_create(name='admin')

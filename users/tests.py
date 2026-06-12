@@ -8,6 +8,10 @@ from django.contrib.auth.tokens import default_token_generator
 
 
 class UserRegistrationTest(APITestCase):
+    """
+    Tests for the user registration endpoint, covering successful registration,
+    duplicate email handling, and password mismatch validation.
+    """
     def setUp(self):
         self.register_url = "/api/auth/register/"
         self.valid_data = {
@@ -42,6 +46,9 @@ class UserRegistrationTest(APITestCase):
 
 
 class UserLoginTest(APITestCase):
+    """
+    Tests for the user login endpoint, verifying successful authentication and handling of invalid credentials.
+    """
     def setUp(self):
         self.login_url = "/api/auth/login/"
         self.user = User.objects.create_user(username="loginuser", password="loginpass")
@@ -59,6 +66,9 @@ class UserLoginTest(APITestCase):
 
 
 class UserProfileTest(APITestCase):
+    """
+    Tests for the user profile endpoint, ensuring that authenticated users can retrieve and update their profile, while unauthenticated users are denied access.
+    """
     def setUp(self):
         self.user = User.objects.create_user(username="profileuser", password="profilepass")
         self.client.force_authenticate(user=self.user)
@@ -83,6 +93,10 @@ class UserProfileTest(APITestCase):
 
 
 class UserLogoutTest(APITestCase):
+    """
+    Tests for the user logout endpoint, verifying that authenticated users can successfully log out and receive the appropriate response message.
+    """
+
     def setUp(self):
         self.user = User.objects.create_user(username="logoutuser", password="logoutpass")
         self.client.force_authenticate(user=self.user)
@@ -95,6 +109,9 @@ class UserLogoutTest(APITestCase):
 
 
 class PasswordResetTest(APITestCase):
+    """
+    Tests for the password reset functionality, including requesting a password reset email and confirming the password reset with a valid token.
+    """
     def setUp(self):
         self.user = User.objects.create_user(
             username="resetuser", email="reset@example.com", password="oldpass"
