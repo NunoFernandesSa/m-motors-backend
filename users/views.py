@@ -123,7 +123,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 'access_token',
                 access_token,
                 httponly=True,
-                secure=False,  # True on production (HTTPS)
+                secure=True,  # True on production (HTTPS)
                 samesite='Lax',
                 max_age=300,   # 5 minutes
                 path='/',
@@ -134,9 +134,9 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 'refresh_token',
                 refresh_token,
                 httponly=True,
-                secure=False,  # True on production (HTTPS)
+                secure=True,  # True on production (HTTPS)
                 samesite='Lax',
-                max_age=86400,
+                max_age=86400, # 1 day
                 path='/',
                 domain='localhost'
             )
