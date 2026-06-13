@@ -2,6 +2,18 @@
 
 Backend Django REST API pour la plateforme de gestion des demandes d'achat et de location de véhicules.
 
+[![Tests](https://img.shields.io/badge/tests-passing-brightgreen)](https://github.com/NunoFernandesSa/m-motors-backend)
+[![Coverage](https://img.shields.io/badge/coverage-87%25-brightgreen)](https://github.com/NunoFernandesSa/m-motors-backend)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+
+## 📌 Contexte
+
+Ce projet est une solution complète de gestion de demandes automobiles (achat ou location longue durée).  
+Les clients peuvent consulter un catalogue, déposer un dossier avec leurs documents, et suivre l’état de leur demande.  
+Les administrateurs et commerciaux peuvent gérer les véhicules, traiter les dossiers et communiquer le motif de validation ou de refus.
+
+Le backend est développé avec Django et Django REST Framework, et expose une API sécurisée consommée par un frontend Next.js.
+
 ## 🚀 Technologies
 
 - **Django** 5.2
@@ -11,6 +23,7 @@ Backend Django REST API pour la plateforme de gestion des demandes d'achat et de
 - **WhiteNoise** pour la gestion des fichiers statiques
 - **AWS S3** pour le stockage des fichiers médias en production
 - **Coverage** pour les tests et le suivi de la couverture de code
+- **UptimeRobot** pour la surveillance proactive des endpoints
 
 ---
 
