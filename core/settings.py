@@ -1,4 +1,5 @@
 from pathlib import Path
+import cloudinary
 import environ
 import os
 from datetime import timedelta
@@ -191,7 +192,15 @@ CLOUDINARY_STORAGE = {
     'API_SECRET': env("API_SECRET"),
 }
 
+cloudinary.config(
+    cloud_name=env("CLOUD_NAME"),
+    api_key=env("API_KEY"),
+    api_secret=env("API_SECRET"),
+)
+
+
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
 
 # base URL for media files
 MEDIA_URL = '/media/'
@@ -201,3 +210,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@mmotors.com'
 FRONTEND_URL = 'http://localhost:3000'
+
+
+# TODO :to delete
+print("*** DEFAULT_FILE_STORAGE =", DEFAULT_FILE_STORAGE)
