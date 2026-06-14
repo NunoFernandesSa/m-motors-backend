@@ -185,22 +185,21 @@ SPECTACULAR_SETTINGS = {
 }
 
 
+# TODO : impelment cloudinary for media files in production
 # --- Cloudinary configuration for media files ---
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': env("CLOUD_NAME"),
-    'API_KEY': env("API_KEY"),
-    'API_SECRET': env("API_SECRET"),
-}
+# CLOUDINARY_STORAGE = {
+#     'CLOUD_NAME': env("CLOUD_NAME"),
+#     'API_KEY': env("API_KEY"),
+#     'API_SECRET': env("API_SECRET"),
+# }
 
-cloudinary.config(
-    cloud_name=env("CLOUD_NAME"),
-    api_key=env("API_KEY"),
-    api_secret=env("API_SECRET"),
-)
+# cloudinary.config(
+#     cloud_name=env("CLOUD_NAME"),
+#     api_key=env("API_KEY"),
+#     api_secret=env("API_SECRET"),
+# )
 
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
+# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # base URL for media files
 MEDIA_URL = '/media/'
