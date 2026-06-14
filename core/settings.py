@@ -210,7 +210,3 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'no-reply@mmotors.com'
 FRONTEND_URL = 'http://localhost:3000'
-
-
-# TODO :to delete
-print("*** DEFAULT_FILE_STORAGE =", DEFAULT_FILE_STORAGE)
