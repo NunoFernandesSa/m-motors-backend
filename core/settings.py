@@ -34,6 +34,8 @@ CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[
     "https://m-motors-ochre.vercel.app"
 ])
 
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Application definition
 INSTALLED_APPS = [
