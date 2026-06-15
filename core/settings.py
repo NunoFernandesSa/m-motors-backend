@@ -26,13 +26,18 @@ SECRET_KEY = env("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = env.list("ALLOWED_HOSTS", default=["localhost", "127.0.0.1", ".onrender.com"])
+ALLOWED_HOSTS = env.list(
+    "ALLOWED_HOSTS", default=["localhost", "127.0.0.1", ".onrender.com"]
+)
 
-CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS", default=[
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    "https://m-motors-ochre.vercel.app"
-])
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://m-motors-ochre.vercel.app",
+    ],
+)
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -58,12 +63,12 @@ INSTALLED_APPS = [
     "folders",
     "vehicles",
     # ----- STORAGE -----
-    'storages',
+    "storages",
     # ----- FILTERS -----
-    'django_filters',
+    "django_filters",
     # ----- Cloudinary -----
-    'cloudinary_storage',
-    'cloudinary',
+    "cloudinary_storage",
+    "cloudinary",
 ]
 
 MIDDLEWARE = [
@@ -113,9 +118,7 @@ WSGI_APPLICATION = "core.wsgi.application"
 # }
 DATABASES = {
     "default": dj_database_url.config(
-        default=env("DATABASE_URL"),
-        conn_max_age=600,
-        ssl_require=True
+        default=env("DATABASE_URL"), conn_max_age=600, ssl_require=True
     )
 }
 
@@ -190,25 +193,19 @@ SPECTACULAR_SETTINGS = {
 
 # TODO : impelment cloudinary for media files in production
 # --- Cloudinary configuration for media files ---
-# CLOUDINARY_STORAGE = {
-#     'CLOUD_NAME': env("CLOUD_NAME"),
-#     'API_KEY': env("API_KEY"),
-#     'API_SECRET': env("API_SECRET"),
-# }
+CLOUDINARY_STORAGE = {
+    "CLOUDINARY_CLOUD_NAME": env("CLOUD_NAME"),
+    "CLOUDINARY_API_KEY": env("API_KEY"),
+    "CLOUDINARY_API_SECRET": env("API_SECRET"),
+}
 
-# cloudinary.config(
-#     cloud_name=env("CLOUD_NAME"),
-#     api_key=env("API_KEY"),
-#     api_secret=env("API_SECRET"),
-# )
-
-# DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # base URL for media files
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Email configuration for development (console backend)
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-DEFAULT_FROM_EMAIL = 'no-reply@mmotors.com'
-FRONTEND_URL = 'http://localhost:3000'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "no-reply@mmotors.com"
+FRONTEND_URL = "http://localhost:3000"
