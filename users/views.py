@@ -181,7 +181,7 @@ class CookieTokenRefreshView(TokenRefreshView):
                     'access_token',
                     access_token,
                     httponly=True,
-                    secure=False,
+                    secure=True,
                     samesite='None',
                     max_age=300,
                     path='/',
@@ -199,8 +199,10 @@ class LogoutView(APIView):
 
     def post(self, request):
         response = Response({"message": "Déconnexion réussie"})
-        response.delete_cookie('access_token')
-        response.delete_cookie('refresh_token')
+        response.delete_cookie('access_token',path='/',
+            samesite='None',)
+        response.delete_cookie('refresh_token',path='/',
+            samesite='None',)
         return response
 
 
