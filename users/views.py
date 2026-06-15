@@ -126,7 +126,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 access_token,
                 httponly=True,
                 secure=True,  # True on production (HTTPS)
-                samesite='Lax',
+                samesite='None',
                 max_age=300,   # 5 minutes
                 path='/',
                 # domain='localhost'
@@ -137,7 +137,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 refresh_token,
                 httponly=True,
                 secure=True,  # True on production (HTTPS)
-                samesite='Lax',
+                samesite='None',
                 max_age=86400, # 1 day
                 path='/',
                 # domain='localhost'
@@ -161,7 +161,7 @@ class CookieTokenRefreshView(TokenRefreshView):
                     access_token,
                     httponly=True,
                     secure=False,
-                    samesite='Lax',
+                    samesite='None',
                     max_age=300,
                     path='/',
                 )
