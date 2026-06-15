@@ -1,4 +1,5 @@
 from rest_framework import generics, status
+from rest_framework_simplejwt.exceptions import InvalidToken
 from .serializers import CustomTokenObtainPairSerializer, PasswordResetConfirmSerializer, PasswordResetSerializer, RegisterSerializer, UserSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
@@ -7,6 +8,7 @@ from drf_spectacular.utils import OpenApiExample, OpenApiResponse, extend_schema
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenRefreshView
 
 
 @extend_schema_view(
@@ -127,7 +129,7 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 samesite='Lax',
                 max_age=300,   # 5 minutes
                 path='/',
-                domain='localhost'
+                # domain='localhost'
             )
             # Refresh token (1 day)
             response.set_cookie(
@@ -138,12 +140,38 @@ class CustomTokenObtainPairView(TokenObtainPairView):
                 samesite='Lax',
                 max_age=86400, # 1 day
                 path='/',
-                domain='localhost'
+                # domain='localhost'
             )
             # Remove the tokens from the JSON body for added security.
             response.data = {'message': 'Connexion réussie'}
         return response
 
+
+class CookieTokenRefreshView(TokenRefreshView):
+    def post(self, request, *args, **kwargs):
+        refresh_token = request.COOKIES.get('refresh_token')
+        if refresh_token:
+            request.data['refresh'] = refresh_token
+        try:
+            response = super().post(request, *args, **kwargs)
+            if response.status_code == 200:
+                access_token = response.data.get('access')
+                response.set_cookie(
+                    'access_token',
+                    access_token,
+                    httponly=True,
+                    secure=False,
+                    samesite='Lax',
+                    max_age=300,
+                    path='/',
+                )
+                response.data = {'message': 'Token rafraîchi'}
+            return response
+        except InvalidToken:
+            return Response({"detail": "Token invalide"}, status=401)
+
+
+  
 @extend_schema(operation_id="logout", summary="Déconnexion", tags=["auth"])
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
