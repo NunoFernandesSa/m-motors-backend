@@ -71,12 +71,33 @@ class RegisterView(generics.CreateAPIView):
         default_group, _ = Group.objects.get_or_create(name='user')
         user.groups.add(default_group)
         refresh = RefreshToken.for_user(user)
-        return Response({
+
+        response = Response({
             "user": UserSerializer(user, context=self.get_serializer_context()).data,
             "message": "Utilisateur enregistré avec succès.",
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
         }, status=status.HTTP_201_CREATED)
+
+        # Access token (5 minutes)
+        response.set_cookie(
+            'access_token',
+            str(refresh.access_token),
+            httponly=True,
+            secure=True,
+            samesite='None',
+            max_age=300,
+            path='/',
+        )
+        # Refresh token (1 day)
+        response.set_cookie(
+            'refresh_token',
+            str(refresh),
+            httponly=True,
+            secure=True,
+            samesite='None',
+            max_age=86400,
+            path='/',
+        )
+        return response
 
 
 @extend_schema_view(
