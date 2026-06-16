@@ -237,26 +237,42 @@ logger = logging.getLogger(__name__)
 logger.info(
     f"[DEBUG] Cloudinary config: CLOUD_NAME='{cloud_name}', API_KEY='{api_key}', API_SECRET='{'*'*len(api_secret) if api_secret else ''}'"
 )
+logger.info(f"[DEBUG] cloud_name truthy: {bool(cloud_name)}")
+logger.info(f"[DEBUG] api_key truthy: {bool(api_key)}")
+logger.info(f"[DEBUG] api_secret truthy: {bool(api_secret)}")
+logger.info(
+    f"[DEBUG] cloud_name length: {len(cloud_name)}, stripped: '{cloud_name.strip()}', stripped truthy: {bool(cloud_name.strip())}"
+)
+logger.info(
+    f"[DEBUG] api_key length: {len(api_key)}, stripped: '{api_key.strip()}', stripped truthy: {bool(api_key.strip())}"
+)
+logger.info(
+    f"[DEBUG] api_secret length: {len(api_secret)}, stripped truthy: {bool(api_secret.strip())}"
+)
 
-if cloud_name and api_key and api_secret:
+cloud_name_stripped = cloud_name.strip()
+api_key_stripped = api_key.strip()
+api_secret_stripped = api_secret.strip()
+
+if cloud_name_stripped and api_key_stripped and api_secret_stripped:
     logger.info("[DEBUG] Using Cloudinary storage!")
     cloudinary.config(
-        cloud_name=cloud_name,
-        api_key=api_key,
-        api_secret=api_secret,
+        cloud_name=cloud_name_stripped,
+        api_key=api_key_stripped,
+        api_secret=api_secret_stripped,
     )
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 else:
     logger.critical("[DEBUG] ⚠️ CLOUDINARY CREDENTIALS MISSING! Using local storage! ⚠️")
     logger.critical(
-        f"[DEBUG] CLOUD_NAME: '{cloud_name}', API_KEY: '{api_key}', API_SECRET: '{'*'*len(api_secret) if api_secret else ''}'"
+        f"[DEBUG] CLOUD_NAME: '{cloud_name_stripped}', API_KEY: '{api_key_stripped}', API_SECRET: '{'*'*len(api_secret_stripped) if api_secret_stripped else ''}'"
     )
     # Fallback to local storage if Cloudinary not configured
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # base URL for media files
-if not cloud_name or not api_key or not api_secret:
+if not cloud_name_stripped or not api_key_stripped or not api_secret_stripped:
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
