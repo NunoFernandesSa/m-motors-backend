@@ -1,6 +1,7 @@
 from pathlib import Path
 import environ
 import os
+import logging
 from datetime import timedelta
 import dj_database_url
 import cloudinary
@@ -16,6 +17,38 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
+
+# Logging configuration - FIRST! So we can log everything!
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "core": {  # our settings.py logger
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "vehicles": {  # our vehicles app logger
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
@@ -187,10 +220,7 @@ CLOUDINARY_STORAGE = {
 }
 
 # Initialize Cloudinary
-import logging
-
 logger = logging.getLogger(__name__)
-
 cloud_name = CLOUDINARY_STORAGE.get("CLOUD_NAME")
 api_key = CLOUDINARY_STORAGE.get("API_KEY")
 api_secret = CLOUDINARY_STORAGE.get("API_SECRET")
@@ -225,35 +255,3 @@ if not cloud_name or not api_key or not api_secret:
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "no-reply@mmotors.com"
 FRONTEND_URL = "http://localhost:3000"
-
-# Logging configuration
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "core": {  # our settings.py logger
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "vehicles": {  # our vehicles app logger
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
