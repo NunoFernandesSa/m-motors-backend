@@ -104,18 +104,6 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 
 # Database
-# https://docs.djangoproject.com/en/6.0/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": env("DB_ENGINE"),
-#         "NAME": env("DB_NAME"),
-#         "PASSWORD": env("DB_PASSWORD"),
-#         "USER": env("DB_USERNAME"),
-#         "HOST": env("DB_HOST"),
-#         "PORT": env("DB_PORT"),
-#     }
-# }
 DATABASES = {
     "default": dj_database_url.config(
         default=env("DATABASE_URL"), conn_max_age=600, ssl_require=True
@@ -190,25 +178,29 @@ SPECTACULAR_SETTINGS = {
     ],
 }
 
-
 # --- Cloudinary configuration for media files ---
 CLOUDINARY_STORAGE = {
-    "CLOUDINARY_CLOUD_NAME": env("CLOUD_NAME", default=""),
-    "CLOUDINARY_API_KEY": env("API_KEY", default=""),
-    "CLOUDINARY_API_SECRET": env("API_SECRET", default=""),
+    "CLOUD_NAME": env("CLOUD_NAME", default=""),
+    "API_KEY": env("API_KEY", default=""),
+    "API_SECRET": env("API_SECRET", default=""),
 }
 
-# Only use Cloudinary if credentials are set
-if (
-    CLOUDINARY_STORAGE["CLOUDINARY_CLOUD_NAME"]
-    and CLOUDINARY_STORAGE["CLOUDINARY_API_KEY"]
-    and CLOUDINARY_STORAGE["CLOUDINARY_API_SECRET"]
-):
+# Only use Cloudinary storage if all credentials are present
+cloud_name = CLOUDINARY_STORAGE.get("CLOUD_NAME")
+api_key = CLOUDINARY_STORAGE.get("API_KEY")
+api_secret = CLOUDINARY_STORAGE.get("API_SECRET")
+
+if cloud_name and api_key and api_secret:
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+else:
+    # Fallback to local storage if Cloudinary not configured
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # base URL for media files
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+if not cloud_name or not api_key or not api_secret:
+    MEDIA_URL = "/media/"
+    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Email configuration for development (console backend)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
