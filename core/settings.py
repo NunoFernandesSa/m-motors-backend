@@ -18,6 +18,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
+# Debug print env vars directly!
+print("[DEBUG] ENVIRONMENT VARIABLES:")
+print(f"[DEBUG] CLOUD_NAME: {os.environ.get('CLOUD_NAME')}")
+print(f"[DEBUG] API_KEY: {os.environ.get('API_KEY')}")
+print(
+    f"[DEBUG] API_SECRET: {'*' * len(os.environ.get('API_SECRET', '')) if os.environ.get('API_SECRET') else 'None'}"
+)
+
 # Logging configuration - FIRST! So we can log everything!
 LOGGING = {
     "version": 1,
