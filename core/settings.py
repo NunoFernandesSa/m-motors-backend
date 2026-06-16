@@ -1,129 +1,56 @@
 from pathlib import Path
-import environ
 import os
-import logging
-from datetime import timedelta
+import environ
 import dj_database_url
 import cloudinary
+import logging
+from datetime import timedelta
 
-
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False)
-)
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# ---------------- BASE ----------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = environ.Env(DEBUG=(bool, False))
 
-# Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-
-# Debug print env vars directly!
-print("[DEBUG] ENVIRONMENT VARIABLES:")
+# ---------------- DEBUG ENV ----------------
+print("[DEBUG] ENV LOADED")
 print(f"[DEBUG] CLOUD_NAME: {os.environ.get('CLOUD_NAME')}")
-print(f"[DEBUG] API_KEY: {os.environ.get('API_KEY')}")
-print(
-    f"[DEBUG] API_SECRET: {'*' * len(os.environ.get('API_SECRET', '')) if os.environ.get('API_SECRET') else 'None'}"
-)
 
-
-# Logging configuration - FIRST! So we can log everything!
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "handlers": {
-        "console": {
-            "class": "logging.StreamHandler",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "core": {  # our settings.py logger
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "vehicles": {  # our vehicles app logger
-            "handlers": ["console"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
-
-
-# Quick-start development settings - unsuitable for production
-# See [https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/](https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/)
-
-
-# SECURITY WARNING: keep the secret key used in production secret!
+# ---------------- SECURITY ----------------
 SECRET_KEY = env("SECRET_KEY")
-
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
-
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS", default=["localhost", "127.0.0.1", ".onrender.com"]
 )
 
-
-CORS_ALLOWED_ORIGINS = env.list(
-    "CORS_ALLOWED_ORIGINS",
-    default=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://m-motors-ochre.vercel.app",
-    ],
-)
-
-
-CORS_ALLOW_CREDENTIALS = True
-
-
-# Application definition
+# ---------------- APPS ----------------
 INSTALLED_APPS = [
-    # ----- Cloudinary -----
-    "cloudinary_storage",
+    # Cloudinary
     "cloudinary",
-    # ----- Django Core -----
+    "cloudinary_storage",
+    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    # ----- REST FRAMEWORK -----
+    # Third party
     "rest_framework",
-    # ----- CORS HEADERS -----
     "corsheaders",
-    # ----- ENVIRON -----
-    "environ",
-    # ----- DRF SPECTACULAR -----
     "drf_spectacular",
-    # ----- APPS -----
+    "django_filters",
+    # Storage
+    "storages",
+    # Apps
     "users",
     "folders",
     "vehicles",
-    # ----- STORAGE -----
-    "storages",
-    # ----- FILTERS -----
-    "django_filters",
 ]
 
-
+# ---------------- MIDDLEWARE ----------------
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -136,10 +63,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
-
 ROOT_URLCONF = "core.urls"
 
-
+# ---------------- TEMPLATES ----------------
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -155,58 +81,57 @@ TEMPLATES = [
     },
 ]
 
-
 WSGI_APPLICATION = "core.wsgi.application"
 
-
-# Database
+# ---------------- DATABASE ----------------
 DATABASES = {
     "default": dj_database_url.config(
         default=env("DATABASE_URL"), conn_max_age=600, ssl_require=True
     )
 }
 
-
-# Password validation
-# [https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators](https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators)
-
-
+# ---------------- AUTH ----------------
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
     },
-    {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
-    },
-    {
-        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
-    },
+    {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
+    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
+    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
 ]
 
-
-# Internationalization
-# [https://docs.djangoproject.com/en/6.0/topics/i18n/](https://docs.djangoproject.com/en/6.0/topics/i18n/)
-
-
+# ---------------- I18N ----------------
 LANGUAGE_CODE = "fr-fr"
-
-
 TIME_ZONE = "Europe/Paris"
-
-
 USE_I18N = True
-
-
 USE_TZ = True
 
+# ---------------- STATIC ----------------
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# Static files (CSS, JavaScript, Images)
-# [https://docs.djangoproject.com/en/6.0/howto/static-files/](https://docs.djangoproject.com/en/6.0/howto/static-files/)
+# IMPORTANT: Django 4+ uses STORAGES ONLY
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
+# ---------------- MEDIA ----------------
+MEDIA_URL = "/media/"
 
+# ---------------- CLOUDINARY ----------------
+cloudinary.config(
+    cloud_name=env("CLOUD_NAME", default=""),
+    api_key=env("API_KEY", default=""),
+    api_secret=env("API_SECRET", default=""),
+    secure=True,
+)
+
+# ---------------- REST ----------------
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "users.authentication.CookieJWTAuthentication",
@@ -215,100 +140,40 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
-
-# JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
 
+# ---------------- CORS ----------------
+CORS_ALLOWED_ORIGINS = env.list(
+    "CORS_ALLOWED_ORIGINS",
+    default=[
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://m-motors-ochre.vercel.app",
+    ],
+)
 
-# DRF Spectacular Settings
+CORS_ALLOW_CREDENTIALS = True
+
+# ---------------- LOGGING ----------------
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "root": {"handlers": ["console"], "level": "INFO"},
+}
+
+# ---------------- DRF SPECTACULAR ----------------
 SPECTACULAR_SETTINGS = {
     "TITLE": "M-Motors API",
-    "DESCRIPTION": "Cette API REST permet de gérer l'intégralité du nouveau service de location longue durée avec option d'achat (LLD+OA) proposé par l'entreprise. Elle alimente l'application web refondue (frontend Next.js) et le back-office.",
+    "DESCRIPTION": "API LLD+OA pour gestion véhicules",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
-    "TAGS": [
-        {
-            "name": "users",
-            "description": "Gestion des utilisateurs et authentification",
-        },
-        {"name": "vehicles", "description": "Gestion du catalogue des véhicules"},
-        {"name": "folders", "description": "Dossiers clients"},
-    ],
 }
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-
-# --- Cloudinary configuration for media files ---
-cloud_name = os.environ.get("CLOUD_NAME", "").strip()
-api_key = os.environ.get("API_KEY", "").strip()
-api_secret = os.environ.get("API_SECRET", "").strip()
-
-
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": cloud_name,
-    "API_KEY": api_key,
-    "API_SECRET": api_secret,
-}
-
-
-# Initialize Cloudinary and set storage
-logger = logging.getLogger(__name__)
-
-
-logger.info(
-    f"[DEBUG] Cloudinary config: CLOUD_NAME='{cloud_name}', API_KEY='{api_key}', API_SECRET='{'*'*len(api_secret) if api_secret else ''}'"
-)
-logger.info(f"[DEBUG] cloud_name truthy: {bool(cloud_name)}")
-logger.info(f"[DEBUG] api_key truthy: {bool(api_key)}")
-logger.info(f"[DEBUG] api_secret truthy: {bool(api_secret)}")
-
-
-if cloud_name and api_key and api_secret:
-    logger.info("[DEBUG] Using Cloudinary storage!")
-
-    cloudinary.config(
-        cloud_name=cloud_name,
-        api_key=api_key,
-        api_secret=api_secret,
-    )
-
-    STORAGES = {
-        "default": {
-            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
-
-else:
-    logger.critical("[DEBUG] ⚠️ CLOUDINARY CREDENTIALS MISSING! Using local storage! ⚠️")
-    logger.critical(
-        f"[DEBUG] CLOUD_NAME: '{cloud_name}', API_KEY: '{api_key}', API_SECRET: '{'*'*len(api_secret) if api_secret else ''}'"
-    )
-    STORAGES = {
-        "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
-        },
-        "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        },
-    }
-
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
-
-
-# Email configuration for development (console backend)
+# ---------------- EMAIL ----------------
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "no-reply@mmotors.com"
 FRONTEND_URL = "http://localhost:3000"
