@@ -221,17 +221,18 @@ SPECTACULAR_SETTINGS = {
 }
 
 # --- Cloudinary configuration for media files ---
+cloud_name = os.environ.get("CLOUD_NAME", "")
+api_key = os.environ.get("API_KEY", "")
+api_secret = os.environ.get("API_SECRET", "")
+
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": env("CLOUD_NAME", default=""),
-    "API_KEY": env("API_KEY", default=""),
-    "API_SECRET": env("API_SECRET", default=""),
+    "CLOUD_NAME": cloud_name,
+    "API_KEY": api_key,
+    "API_SECRET": api_secret,
 }
 
 # Initialize Cloudinary
 logger = logging.getLogger(__name__)
-cloud_name = CLOUDINARY_STORAGE.get("CLOUD_NAME")
-api_key = CLOUDINARY_STORAGE.get("API_KEY")
-api_secret = CLOUDINARY_STORAGE.get("API_SECRET")
 
 logger.info(
     f"[DEBUG] Cloudinary config: CLOUD_NAME='{cloud_name}', API_KEY='{api_key}', API_SECRET='{'*'*len(api_secret) if api_secret else ''}'"
