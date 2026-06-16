@@ -208,7 +208,10 @@ if cloud_name and api_key and api_secret:
     )
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 else:
-    logger.warning("[DEBUG] Cloudinary not configured! Using local storage!")
+    logger.critical("[DEBUG] ⚠️ CLOUDINARY CREDENTIALS MISSING! Using local storage! ⚠️")
+    logger.critical(
+        f"[DEBUG] CLOUD_NAME: '{cloud_name}', API_KEY: '{api_key}', API_SECRET: '{'*'*len(api_secret) if api_secret else ''}'"
+    )
     # Fallback to local storage if Cloudinary not configured
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
