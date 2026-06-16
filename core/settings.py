@@ -3,6 +3,7 @@ import environ
 import os
 from datetime import timedelta
 import dj_database_url
+import cloudinary
 
 env = environ.Env(
     # set casting, default value
@@ -185,14 +186,29 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": env("API_SECRET", default=""),
 }
 
-# Only use Cloudinary storage if all credentials are present
+# Initialize Cloudinary
+import logging
+
+logger = logging.getLogger(__name__)
+
 cloud_name = CLOUDINARY_STORAGE.get("CLOUD_NAME")
 api_key = CLOUDINARY_STORAGE.get("API_KEY")
 api_secret = CLOUDINARY_STORAGE.get("API_SECRET")
 
+logger.info(
+    f"[DEBUG] Cloudinary config: CLOUD_NAME='{cloud_name}', API_KEY='{api_key}', API_SECRET='{'*'*len(api_secret) if api_secret else ''}'"
+)
+
 if cloud_name and api_key and api_secret:
+    logger.info("[DEBUG] Using Cloudinary storage!")
+    cloudinary.config(
+        cloud_name=cloud_name,
+        api_key=api_key,
+        api_secret=api_secret,
+    )
     DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 else:
+    logger.warning("[DEBUG] Cloudinary not configured! Using local storage!")
     # Fallback to local storage if Cloudinary not configured
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")

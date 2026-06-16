@@ -51,22 +51,55 @@ class VehicleSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """Custom create method to handle the creation of a Vehicle instance along with its associated images. It first extracts the uploaded images from the validated data, creates the Vehicle instance, and then iterates over the uploaded images to create corresponding VehicleImage instances linked to the created Vehicle. This allows for a seamless creation process where both the vehicle and its images can be created in a single API request."""
+        import logging
+
+        logger = logging.getLogger(__name__)
+
         uploaded_images = validated_data.pop("uploaded_images", [])
+        logger.info(f"[DEBUG] Number of uploaded images: {len(uploaded_images)}")
+
         vehicle = Vehicle.objects.create(**validated_data)
         for idx, img in enumerate(uploaded_images):
-            VehicleImage.objects.create(vehicle=vehicle, image=img, order=idx)
+            logger.info(
+                f"[DEBUG] Creating VehicleImage {idx} with file: {img.name}, size: {img.size}"
+            )
+            vehicle_image = VehicleImage.objects.create(
+                vehicle=vehicle, image=img, order=idx
+            )
+            logger.info(
+                f"[DEBUG] VehicleImage created, image URL: {vehicle_image.image.url}"
+            )
+
         return vehicle
 
     def update(self, instance, validated_data):
         """Custom update method to handle the updating of a Vehicle instance along with its associated images. It first extracts the uploaded images from the validated data, updates the Vehicle instance with the new data, and then checks if there are any uploaded images. If there are, it deletes all existing images associated with the vehicle and creates new VehicleImage instances for each of the uploaded images. This allows for a seamless update process where both the vehicle and its images can be updated in a single API request."""
+        import logging
+
+        logger = logging.getLogger(__name__)
+
         uploaded_images = validated_data.pop("uploaded_images", None)
+        logger.info(
+            f"[DEBUG] Number of uploaded images for update: {len(uploaded_images) if uploaded_images else 0}"
+        )
+
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
+
         if uploaded_images is not None:
             instance.images.all().delete()
             for idx, img in enumerate(uploaded_images):
-                VehicleImage.objects.create(vehicle=instance, image=img, order=idx)
+                logger.info(
+                    f"[DEBUG] Creating VehicleImage {idx} with file: {img.name}, size: {img.size}"
+                )
+                vehicle_image = VehicleImage.objects.create(
+                    vehicle=instance, image=img, order=idx
+                )
+                logger.info(
+                    f"[DEBUG] VehicleImage created, image URL: {vehicle_image.image.url}"
+                )
+
         return instance
 
     @extend_schema_field(serializers.DecimalField(max_digits=10, decimal_places=2))
