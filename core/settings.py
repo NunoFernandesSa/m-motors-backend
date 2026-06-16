@@ -3,17 +3,14 @@ import os
 import environ
 import dj_database_url
 import cloudinary
-import logging
 from datetime import timedelta
 
 # ---------------- BASE ----------------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env(DEBUG=(bool, False))
-
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
-# ---------------- DEBUG ENV ----------------
 print("[DEBUG] ENV LOADED")
 print(f"[DEBUG] CLOUD_NAME: {os.environ.get('CLOUD_NAME')}")
 
@@ -27,10 +24,9 @@ ALLOWED_HOSTS = env.list(
 
 # ---------------- APPS ----------------
 INSTALLED_APPS = [
-    # Cloudinary
+    # Cloudinary (MEDIA ONLY)
     "cloudinary",
-    "cloudinary_storage",
-    # Django
+    # Django core
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -42,7 +38,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "drf_spectacular",
     "django_filters",
-    # Storage
     "storages",
     # Apps
     "users",
@@ -106,30 +101,30 @@ TIME_ZONE = "Europe/Paris"
 USE_I18N = True
 USE_TZ = True
 
-# ---------------- STATIC ----------------
+# ---------------- STATIC (WHITE NOISE ONLY) ----------------
 STATIC_URL = "/static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-# IMPORTANT: Django 4+ uses STORAGES ONLY
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
 
-# ---------------- MEDIA ----------------
+# ---------------- MEDIA (CLOUDINARY ONLY) ----------------
 MEDIA_URL = "/media/"
 
-# ---------------- CLOUDINARY ----------------
 cloudinary.config(
     cloud_name=env("CLOUD_NAME", default=""),
     api_key=env("API_KEY", default=""),
     api_secret=env("API_SECRET", default=""),
     secure=True,
 )
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # ---------------- REST ----------------
 REST_FRAMEWORK = {
