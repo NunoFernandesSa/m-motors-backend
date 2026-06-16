@@ -1,5 +1,4 @@
 from pathlib import Path
-import cloudinary
 import environ
 import os
 from datetime import timedelta
@@ -191,15 +190,20 @@ SPECTACULAR_SETTINGS = {
 }
 
 
-# TODO : impelment cloudinary for media files in production
 # --- Cloudinary configuration for media files ---
 CLOUDINARY_STORAGE = {
-    "CLOUDINARY_CLOUD_NAME": env("CLOUD_NAME"),
-    "CLOUDINARY_API_KEY": env("API_KEY"),
-    "CLOUDINARY_API_SECRET": env("API_SECRET"),
+    "CLOUDINARY_CLOUD_NAME": env("CLOUD_NAME", default=""),
+    "CLOUDINARY_API_KEY": env("API_KEY", default=""),
+    "CLOUDINARY_API_SECRET": env("API_SECRET", default=""),
 }
 
-DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+# Only use Cloudinary if credentials are set
+if (
+    CLOUDINARY_STORAGE["CLOUDINARY_CLOUD_NAME"]
+    and CLOUDINARY_STORAGE["CLOUDINARY_API_KEY"]
+    and CLOUDINARY_STORAGE["CLOUDINARY_API_SECRET"]
+):
+    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 # base URL for media files
 MEDIA_URL = "/media/"
