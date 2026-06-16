@@ -225,3 +225,35 @@ if not cloud_name or not api_key or not api_secret:
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 DEFAULT_FROM_EMAIL = "no-reply@mmotors.com"
 FRONTEND_URL = "http://localhost:3000"
+
+# Logging configuration
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "core": {  # our settings.py logger
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+        "vehicles": {  # our vehicles app logger
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
+}
