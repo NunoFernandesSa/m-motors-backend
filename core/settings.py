@@ -43,6 +43,10 @@ CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 INSTALLED_APPS = [
+    # ----- Cloudinary -----
+    "cloudinary_storage",
+    "cloudinary",
+    # ----- Django Core -----
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -65,9 +69,6 @@ INSTALLED_APPS = [
     "storages",
     # ----- FILTERS -----
     "django_filters",
-    # ----- Cloudinary -----
-    "cloudinary_storage",
-    "cloudinary",
 ]
 
 MIDDLEWARE = [
