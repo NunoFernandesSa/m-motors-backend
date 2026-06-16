@@ -6,10 +6,12 @@ from datetime import timedelta
 import dj_database_url
 import cloudinary
 
+
 env = environ.Env(
     # set casting, default value
     DEBUG=(bool, False)
 )
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -18,6 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Take environment variables from .env file
 environ.Env.read_env(os.path.join(BASE_DIR, ".env"))
 
+
 # Debug print env vars directly!
 print("[DEBUG] ENVIRONMENT VARIABLES:")
 print(f"[DEBUG] CLOUD_NAME: {os.environ.get('CLOUD_NAME')}")
@@ -25,6 +28,7 @@ print(f"[DEBUG] API_KEY: {os.environ.get('API_KEY')}")
 print(
     f"[DEBUG] API_SECRET: {'*' * len(os.environ.get('API_SECRET', '')) if os.environ.get('API_SECRET') else 'None'}"
 )
+
 
 # Logging configuration - FIRST! So we can log everything!
 LOGGING = {
@@ -58,18 +62,23 @@ LOGGING = {
     },
 }
 
+
 # Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
+# See [https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/](https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/)
+
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env("SECRET_KEY")
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
+
 
 ALLOWED_HOSTS = env.list(
     "ALLOWED_HOSTS", default=["localhost", "127.0.0.1", ".onrender.com"]
 )
+
 
 CORS_ALLOWED_ORIGINS = env.list(
     "CORS_ALLOWED_ORIGINS",
@@ -79,6 +88,7 @@ CORS_ALLOWED_ORIGINS = env.list(
         "https://m-motors-ochre.vercel.app",
     ],
 )
+
 
 CORS_ALLOW_CREDENTIALS = True
 
@@ -113,6 +123,7 @@ INSTALLED_APPS = [
     "django_filters",
 ]
 
+
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -125,7 +136,9 @@ MIDDLEWARE = [
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
+
 ROOT_URLCONF = "core.urls"
+
 
 TEMPLATES = [
     {
@@ -142,6 +155,7 @@ TEMPLATES = [
     },
 ]
 
+
 WSGI_APPLICATION = "core.wsgi.application"
 
 
@@ -152,8 +166,10 @@ DATABASES = {
     )
 }
 
+
 # Password validation
-# https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
+# [https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators](https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators)
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -172,23 +188,24 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # Internationalization
-# https://docs.djangoproject.com/en/6.0/topics/i18n/
+# [https://docs.djangoproject.com/en/6.0/topics/i18n/](https://docs.djangoproject.com/en/6.0/topics/i18n/)
+
 
 LANGUAGE_CODE = "fr-fr"
 
+
 TIME_ZONE = "Europe/Paris"
 
+
 USE_I18N = True
+
 
 USE_TZ = True
 
 
 # Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/6.0/howto/static-files/
+# [https://docs.djangoproject.com/en/6.0/howto/static-files/](https://docs.djangoproject.com/en/6.0/howto/static-files/)
 
-STATIC_URL = "static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
@@ -198,11 +215,13 @@ REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
 }
 
+
 # JWT Settings
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
 }
+
 
 # DRF Spectacular Settings
 SPECTACULAR_SETTINGS = {
@@ -220,10 +239,12 @@ SPECTACULAR_SETTINGS = {
     ],
 }
 
+
 # --- Cloudinary configuration for media files ---
-cloud_name = os.environ.get("CLOUD_NAME", "")
-api_key = os.environ.get("API_KEY", "")
-api_secret = os.environ.get("API_SECRET", "")
+cloud_name = os.environ.get("CLOUD_NAME", "").strip()
+api_key = os.environ.get("API_KEY", "").strip()
+api_secret = os.environ.get("API_SECRET", "").strip()
+
 
 CLOUDINARY_STORAGE = {
     "CLOUD_NAME": cloud_name,
@@ -231,8 +252,10 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": api_secret,
 }
 
-# Initialize Cloudinary
+
+# Initialize Cloudinary and set storage
 logger = logging.getLogger(__name__)
+
 
 logger.info(
     f"[DEBUG] Cloudinary config: CLOUD_NAME='{cloud_name}', API_KEY='{api_key}', API_SECRET='{'*'*len(api_secret) if api_secret else ''}'"
@@ -240,41 +263,48 @@ logger.info(
 logger.info(f"[DEBUG] cloud_name truthy: {bool(cloud_name)}")
 logger.info(f"[DEBUG] api_key truthy: {bool(api_key)}")
 logger.info(f"[DEBUG] api_secret truthy: {bool(api_secret)}")
-logger.info(
-    f"[DEBUG] cloud_name length: {len(cloud_name)}, stripped: '{cloud_name.strip()}', stripped truthy: {bool(cloud_name.strip())}"
-)
-logger.info(
-    f"[DEBUG] api_key length: {len(api_key)}, stripped: '{api_key.strip()}', stripped truthy: {bool(api_key.strip())}"
-)
-logger.info(
-    f"[DEBUG] api_secret length: {len(api_secret)}, stripped truthy: {bool(api_secret.strip())}"
-)
 
-cloud_name_stripped = cloud_name.strip()
-api_key_stripped = api_key.strip()
-api_secret_stripped = api_secret.strip()
 
-if cloud_name_stripped and api_key_stripped and api_secret_stripped:
+if cloud_name and api_key and api_secret:
     logger.info("[DEBUG] Using Cloudinary storage!")
+
     cloudinary.config(
-        cloud_name=cloud_name_stripped,
-        api_key=api_key_stripped,
-        api_secret=api_secret_stripped,
+        cloud_name=cloud_name,
+        api_key=api_key,
+        api_secret=api_secret,
     )
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
+
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
 else:
     logger.critical("[DEBUG] ⚠️ CLOUDINARY CREDENTIALS MISSING! Using local storage! ⚠️")
     logger.critical(
-        f"[DEBUG] CLOUD_NAME: '{cloud_name_stripped}', API_KEY: '{api_key_stripped}', API_SECRET: '{'*'*len(api_secret_stripped) if api_secret_stripped else ''}'"
+        f"[DEBUG] CLOUD_NAME: '{cloud_name}', API_KEY: '{api_key}', API_SECRET: '{'*'*len(api_secret) if api_secret else ''}'"
     )
-    # Fallback to local storage if Cloudinary not configured
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        },
+    }
+
     MEDIA_URL = "/media/"
     MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
-# base URL for media files
-if not cloud_name_stripped or not api_key_stripped or not api_secret_stripped:
-    MEDIA_URL = "/media/"
-    MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+
 
 # Email configuration for development (console backend)
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
